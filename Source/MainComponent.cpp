@@ -34,7 +34,7 @@ MainComponent::MainComponent() : juce::AudioAppComponent(otherDeviceManager), st
     formatManager.registerBasicFormats();
     transport.addChangeListener(this);
     
-    setSize (400, 700);
+    setSize (400, 600);
 }
 
 MainComponent::~MainComponent()
@@ -51,31 +51,52 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 
 void MainComponent::openButtonClicked()
 {
-    //choose a file
-    FileChooser chooser ("Choose a Wav or AIFF File", File::getSpecialLocation(File::userDesktopDirectory), "*.wav; *.mp3");
+    chooser = std::make_unique<juce::FileChooser>("Choose a Wav or AIFF File", juce::File{}, "*.wav; *.mp3");
+    
+    auto chooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+
+    chooser->launchAsync(chooserFlags, [this] (const juce::FileChooser& fc)
+                         {
+                                     auto file = fc.getResult();
+        DBG("Ok");
+                                        
+                                     if (file != juce::File{})
+                                     {
+                                         auto* reader = formatManager.createReaderFor (file);
+                          
+                                         if (reader != nullptr)
+                                         {
+                                             auto newSource = std::make_unique<juce::AudioFormatReaderSource> (reader, true);   // [11]
+                                             transport.setSource (newSource.get(), 0, nullptr, reader->sampleRate);
+                                             playButton.setEnabled (true);
+                                             playSource.reset (newSource.release());
+                                         }
+                                     }
+                                 });
+    transportStateChanged(Stopped);
     
     //if the user chooses a file
-    if (chooser.browseForFileToOpen())
-    {
-        File myFile;
-        
-        //what did the user choose?
-        myFile = chooser.getResult();
-        
-        //read the file
-        AudioFormatReader* reader = formatManager.createReaderFor(myFile);
-        
-        if (reader != nullptr)
-        {
-            //get the file ready to play
-            std::unique_ptr<AudioFormatReaderSource> tempSource (new AudioFormatReaderSource (reader, true));
-        
-            transport.setSource(tempSource.get());
-            transportStateChanged(Stopped);
-        
-            playSource.reset(tempSource.release());
-        }
-    }
+//    if (chooser->browseForFileToOpen())
+//    {
+//        File myFile;
+//
+//        //what did the user choose?
+//        myFile = chooser->getResult();
+//
+//        //read the file
+//        AudioFormatReader* reader = formatManager.createReaderFor(myFile);
+//
+//        if (reader != nullptr)
+//        {
+//            //get the file ready to play
+//            std::unique_ptr<AudioFormatReaderSource> tempSource (new AudioFormatReaderSource (reader, true));
+//
+//            transport.setSource(tempSource.get());
+//            transportStateChanged(Stopped);
+//
+//            playSource.reset(tempSource.release());
+//        }
+//    }
 }
 
 void MainComponent::playButtonClicked()

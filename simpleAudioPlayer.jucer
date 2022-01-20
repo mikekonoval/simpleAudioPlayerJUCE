@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="zoErEt" name="simpleAudioPlayer" projectType="guiapp" jucerVersion="5.3.2">
+<JUCERPROJECT id="zoErEt" name="simpleAudioPlayer" projectType="guiapp" displaySplashScreen="1"
+              jucerFormatVersion="1">
   <MAINGROUP id="gVx3r7" name="simpleAudioPlayer">
     <GROUP id="{E2A6EBF0-342D-5A41-5563-94F6064CB34B}" name="Source">
       <FILE id="JDo7zm" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>

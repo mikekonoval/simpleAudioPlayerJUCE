@@ -36,6 +36,8 @@ private:
     AudioDeviceManager otherDeviceManager;
     std::unique_ptr <AudioDeviceSelectorComponent> audioSettings;
     
+    std::unique_ptr<juce::FileChooser> chooser;
+    
     enum TransportState
     {
         Stopped,
